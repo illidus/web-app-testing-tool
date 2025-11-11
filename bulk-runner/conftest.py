@@ -228,11 +228,32 @@ def page(context: BrowserContext):
 
 @pytest.fixture
 def base_url():
-    """Provide the base URL from environment variables."""
+    """Provide the base URL from environment variables or catalog."""
     url = os.getenv('BASE_URL')
     if not url:
-        pytest.fail("BASE_URL environment variable is not set")
+        # Try to get from catalog as fallback
+        catalog = load_catalog()
+        url = catalog.get('base_url')
+    if not url:
+        pytest.fail("BASE_URL not set in environment variables or catalog.yml")
     return url
+
+
+@pytest.fixture
+def farm_id(test_params: Dict[str, Any]):
+    """Provide the farm ID from catalog or environment variables."""
+    # Try environment variable first
+    farm_id = os.getenv('FARM_ID')
+    if farm_id:
+        return int(farm_id)
+
+    # Fall back to catalog
+    catalog = test_params.get('catalog', {})
+    farm_id = catalog.get('farm_id')
+    if farm_id:
+        return int(farm_id)
+
+    pytest.fail("FARM_ID not set in environment variables or catalog.yml")
 
 
 @pytest.fixture
