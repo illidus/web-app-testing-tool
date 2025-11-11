@@ -45,7 +45,7 @@ python -m playwright install chromium
 cp .env.example .env
 
 # 6. Run tests
-pytest -n auto
+python -m pytest -n auto
 
 # 7. Generate reports
 python tools/summarize.py
@@ -93,9 +93,8 @@ After first-time setup, just:
 
 ```bash
 cd bulk-runner
-source .venv/bin/activate  # Activate virtual environment
-pytest -n auto              # Run tests
-python tools/summarize.py   # Generate summary
+python -m pytest -n auto     # Run tests
+python tools/summarize.py    # Generate summary
 ```
 
 ## Configuration Files
@@ -124,7 +123,7 @@ You **don't need to edit anything** for v1!
 
 ### Want to see the browser?
 ```bash
-pytest --headed --slow-mo 500
+python -m pytest --headed --slow-mo 500
 ```
 
 ## What Gets Created on Staging
@@ -140,17 +139,17 @@ Each test run creates:
 
 ### Run smoke test only
 ```bash
-pytest -k smoke
+python -m pytest -k smoke
 ```
 
 ### Run with specific worker count
 ```bash
-pytest -n 4  # Use 4 parallel workers
+python -m pytest -n 4  # Use 4 parallel workers
 ```
 
 ### Run without parallelism (for debugging)
 ```bash
-pytest -v  # Verbose, single-threaded
+python -m pytest -v  # Verbose, single-threaded
 ```
 
 ### View detailed logs
