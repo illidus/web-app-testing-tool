@@ -6,10 +6,15 @@ Generates a summary.md file with pass rates and flake detection.
 
 import json
 import sys
+import io
 from pathlib import Path
 from collections import defaultdict
 from typing import Dict, List, Any
 from datetime import datetime
+
+# Set UTF-8 encoding for Windows console to support emojis
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
 def load_results(results_path: Path) -> Dict[str, Any]:
@@ -147,7 +152,7 @@ def analyze_results(results: Dict[str, Any]) -> Dict[str, Any]:
 
 def generate_summary_markdown(analysis: Dict[str, Any], output_path: Path):
     """Generate a Markdown summary report."""
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         f.write("# Bulk Upload Workflow Test Summary\n\n")
 
         # Timestamp

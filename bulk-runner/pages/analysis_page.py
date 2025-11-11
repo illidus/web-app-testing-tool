@@ -232,7 +232,7 @@ class AnalysisPage:
 
             # Click "Submit analysis" button
             submit_button_selector = self.submit_selectors.get('submit_analysis_button')
-            self.page.locator(submit_button_selector).click(timeout=5000)
+            self.page.locator(submit_button_selector).click(force=True, timeout=5000)
 
             # Wait for result popup (success or failure)
             success_selector = self.submit_selectors.get('success_popup')

@@ -55,8 +55,9 @@ class LoginPage:
             submit_selector = self.selectors.get('submit_button')
             self.page.locator(submit_selector).click(timeout=timeout)
 
-            # Wait for page to load after login
-            self.page.wait_for_load_state('networkidle', timeout=timeout)
+            # Wait for navigation away from login page (URL-based, more reliable than networkidle)
+            # The dashboard loads heavy map resources that prevent networkidle from completing
+            self.page.wait_for_url(lambda url: '/login' not in url.lower(), timeout=timeout)
 
         except Exception as e:
             raise Exception(f"Login failed: {str(e)}")

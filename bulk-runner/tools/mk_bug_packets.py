@@ -7,9 +7,14 @@ Each bug packet contains all the information needed to paste into GitLab.
 import json
 import re
 import sys
+import io
 from pathlib import Path
 from typing import Dict, Any, List
 from datetime import datetime
+
+# Set UTF-8 encoding for Windows console to support emojis
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
 def sanitize_filename(s: str) -> str:
@@ -144,7 +149,7 @@ def generate_bug_packet(test: Dict[str, Any], base_dir: Path, bugs_dir: Path) ->
 
     bug_file = bugs_dir / f"bug_{bug_id}.md"
 
-    with open(bug_file, 'w') as f:
+    with open(bug_file, 'w', encoding='utf-8') as f:
         f.write("# Bug Report: Upload Workflow Failure\n\n")
 
         # Metadata

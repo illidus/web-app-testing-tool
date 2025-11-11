@@ -312,9 +312,9 @@ def pytest_runtest_makereport(item, call):
                 # Save screenshot
                 try:
                     page.screenshot(path=str(artifact_paths['screenshot']), full_page=True)
-                    print(f"\n📸 Screenshot saved: {artifact_paths['screenshot']}")
+                    print(f"\n Screenshot saved: {artifact_paths['screenshot']}")
                 except Exception as e:
-                    print(f"\n⚠️  Failed to save screenshot: {e}")
+                    print(f"\n  Failed to save screenshot: {e}")
 
                 # Get page content snippet (capped at 100KB)
                 try:
@@ -336,19 +336,19 @@ def pytest_runtest_makereport(item, call):
                         f.write(f"{'='*80}\n")
                         f.write(content)
 
-                    print(f"📝 Log saved: {artifact_paths['log']}")
+                    print(f" Log saved: {artifact_paths['log']}")
                 except Exception as e:
-                    print(f"⚠️  Failed to save log: {e}")
+                    print(f"  Failed to save log: {e}")
 
             # Save trace
             if context and artifact_paths:
                 try:
                     context.tracing.stop(path=str(artifact_paths['trace']))
-                    print(f"🔍 Trace saved: {artifact_paths['trace']}")
+                    print(f" Trace saved: {artifact_paths['trace']}")
                     # Restart tracing for potential teardown
                     context.tracing.start(screenshots=True, snapshots=True, sources=True)
                 except Exception as e:
-                    print(f"⚠️  Failed to save trace: {e}")
+                    print(f"  Failed to save trace: {e}")
 
         except Exception as e:
-            print(f"\n⚠️  Error in failure handler: {e}")
+            print(f"\n  Error in failure handler: {e}")

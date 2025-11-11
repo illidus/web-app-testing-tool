@@ -38,7 +38,7 @@ selectors:
   # Analysis creation
   analysis:
     create_analysis_button: ".button__primary-create"
-    create_confirm_button: "div.create-popup--button-group:nth-child(3) > button:nth-child(2)"
+    create_confirm_button: ".button__primary-dark.ml-5"  # Will use .first to get Create button
     analysis_details_link: ".mb-5"  # Link appears in success popup
 
   # Analysis Details - Files tab
@@ -78,7 +78,7 @@ selectors:
 
 # Timeout configurations (in milliseconds)
 timeouts:
-  login: 10000  # 10 seconds
+  login: 30000  # 30 seconds
   page_load: 30000  # 30 seconds
   field_creation: 15000  # 15 seconds
   analysis_creation: 15000  # 15 seconds

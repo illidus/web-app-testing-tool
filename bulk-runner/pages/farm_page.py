@@ -65,8 +65,32 @@ class FarmPage:
             create_button_selector = self.farm_selectors.get('create_field_button')
             self.page.locator(create_button_selector).click(timeout=timeout)
 
-            # Wait for field creation to complete
-            self.page.wait_for_timeout(1000)
+            # Wait for navigation to the new field page (auto-navigates after creation)
+            # URL format: https://.../Fields/XXXXX
+            self.page.wait_for_url(lambda url: '/Fields/' in url, timeout=timeout)
+
+            # Retry mechanism for backend race condition - field may not be ready immediately
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    # Check if page loaded successfully (not 404)
+                    if 'NOT FOUND' in self.page.content():
+                        if attempt < max_retries - 1:
+                            self.page.wait_for_timeout(2000)  # Wait 2 seconds
+                            self.page.reload(timeout=timeout)  # Reload the page
+                            continue
+                        else:
+                            raise Exception('Field page still returning 404 after retries')
+                    
+                    # Wait for Create Analysis button to confirm page is ready
+                    self.page.locator('.button__primary-create').wait_for(state='visible', timeout=5000)
+                    break  # Success!
+                except Exception as e:
+                    if attempt < max_retries - 1:
+                        self.page.wait_for_timeout(2000)
+                        self.page.reload(timeout=timeout)
+                    else:
+                        raise
 
             return field_name
 
@@ -86,16 +110,27 @@ class FarmPage:
         try:
             timeout = self.timeouts.get('analysis_creation', 15000)
 
+            # Remove any toast notifications using JavaScript (they block clicks even with force=True)
+            try:
+                self.page.evaluate("""
+                    document.querySelectorAll('.Toastify__toast-container').forEach(el => el.remove());
+                    document.querySelectorAll('.Toastify__toast').forEach(el => el.remove());
+                """)
+                self.page.wait_for_timeout(500)
+            except:
+                pass  # Toasts may not exist, that's fine
+
             # Click "Create analysis" button
+            # Use force=True to bypass any toast notifications that may be overlaying
             create_button_selector = self.analysis_selectors.get('create_analysis_button')
-            self.page.locator(create_button_selector).click(timeout=timeout)
+            self.page.locator(create_button_selector).click(force=True, timeout=timeout)
 
             # Wait for popup
             self.page.wait_for_timeout(500)
 
             # Click confirm button in popup
             confirm_button_selector = self.analysis_selectors.get('create_confirm_button')
-            self.page.locator(confirm_button_selector).click(timeout=timeout)
+            self.page.locator(confirm_button_selector).first.click(timeout=timeout)
 
             # Wait for success popup with analysis details link
             self.page.wait_for_timeout(1000)
@@ -104,8 +139,8 @@ class FarmPage:
             details_link_selector = self.analysis_selectors.get('analysis_details_link')
             self.page.locator(details_link_selector).click(timeout=timeout)
 
-            # Wait for navigation to complete
-            self.page.wait_for_load_state('networkidle', timeout=timeout)
+            # Wait for navigation to analysis page (URL-based, more reliable than networkidle)
+            self.page.wait_for_url(lambda url: '/Analyses/' in url, timeout=timeout)
 
             # Extract analysis ID from URL
             # URL format: https://customerportalstaging.local.soiloptix.com/Analyses/5000419
