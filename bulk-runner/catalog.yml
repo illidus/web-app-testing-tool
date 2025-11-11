@@ -1,0 +1,54 @@
+# Test Matrix Configuration
+# Defines roles, feature flags, datasets, and repeat count for bulk testing
+
+roles:
+  - analyst
+  - admin
+
+flags:
+  - name: fast_preprocess
+    values: [off, on]
+
+datasets:
+  - id: acme_small_ok
+    path: datasets/acme/small_ok.zip
+    classification: synthetic
+    expected: success
+  - id: acme_small_bad_header
+    path: datasets/acme/small_bad_header.zip
+    classification: synthetic
+    expected: input_error
+  - id: beta_medium_ok
+    path: datasets/beta/medium_ok.zip
+    classification: sanitized
+    expected: success
+  # Example of sensitive dataset (skipped by default)
+  # - id: prod_sample_anonymized
+  #   path: datasets/prod/sample_anonymized.zip
+  #   classification: real-sensitive
+  #   expected: success
+
+# Number of times to repeat each test permutation (for flake detection)
+repeats: 3
+
+# Page selectors (configurable for different environments)
+selectors:
+  login:
+    username_field: "input[name='username']"
+    password_field: "input[name='password']"
+    submit_button: "button[type='submit']"
+  upload:
+    file_input: "input[type='file']"
+    submit_button: "button#upload-submit"
+    success_indicator: "text=Preprocessing complete"
+    error_banner: ".error-banner"
+  # Feature flag selectors (if visible in UI)
+  feature_flags:
+    fast_preprocess: "input[name='fast_preprocess']"
+
+# Timeout configurations (in milliseconds)
+timeouts:
+  login: 10000
+  upload: 5000
+  preprocessing: 120000  # 2 minutes max for preprocessing
+  page_load: 30000
