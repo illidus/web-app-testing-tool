@@ -1,0 +1,87 @@
+# Test Matrix Configuration - SoilOptix Customer Portal
+# Updated for actual workflow: Field Creation → Analysis Creation → File Upload → Submit
+
+# Base URLs
+base_url: "https://customerportalstaging.local.soiloptix.com"
+farm_id: 20101  # Test farm ID
+
+# Roles (v1: single role)
+roles:
+  - customer
+
+# Datasets (v1: single valid scenario)
+datasets:
+  - id: soiloptix_sample_valid
+    lab: datasets/soiloptix/lab/sample_lab_valid.csv
+    survey: datasets/soiloptix/survey/sample_survey_valid.zip
+    boundary: null  # Optional, not included in v1
+    classification: synthetic
+    expected: success
+
+# Number of times to repeat each test permutation (for flake detection)
+repeats: 2
+
+# Page selectors (from Chrome Inspect → Copy CSS Selector)
+selectors:
+  # Login page
+  login:
+    username_field: "div.login__input--container:nth-child(1) > input:nth-child(3)"
+    password_field: "#password"
+    submit_button: ".login__button--primary"
+
+  # Farm page - Field management
+  farm:
+    add_field_button: ".button__add-small"
+    field_name_input: ".create-popup--input-form"
+    create_field_button: ".create-popup--container > div:nth-child(1) > div:nth-child(4) > button:nth-child(2)"
+
+  # Analysis creation
+  analysis:
+    create_analysis_button: ".button__primary-create"
+    create_confirm_button: ".button__primary-dark.ml-5"  # Will use .first to get Create button
+    analysis_details_link: ".mb-5"  # Link appears in success popup
+
+  # Analysis Details - Files tab
+  files:
+    files_tab: "button.tab-pill:nth-child(2)"
+
+    # Lab file upload
+    upload_lab_button: "div.file-folder-section:nth-child(2) > div:nth-child(1) > button:nth-child(2)"
+    lab_upload_box: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(4) > div:nth-child(3) > label:nth-child(1)"
+    lab_upload_confirm: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > button:nth-child(2)"
+
+    # Survey file upload
+    upload_survey_button: "div.file-folder-section:nth-child(3) > div:nth-child(1) > button:nth-child(2)"
+    survey_upload_box: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(4) > div:nth-child(3) > label:nth-child(1)"
+    survey_upload_confirm: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > button:nth-child(2)"
+
+    # Boundary file upload
+    upload_boundary_button: "div.file-folder-section:nth-child(4) > div:nth-child(1) > button:nth-child(2)"
+    boundary_upload_box: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(4) > div:nth-child(3) > label:nth-child(1)"
+    boundary_upload_confirm: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > button:nth-child(2)"
+
+    # Upload status and controls
+    upload_success: ".success-section"
+    upload_error: ".upload-error"
+    close_popup: "button.button__primary-dark:nth-child(1)"
+
+  # Submit tab
+  submit:
+    submit_tab: "button.tab-pill:nth-child(4)"
+    select_package_button: ".package-select-button"
+    save_package_button: ".save-package-button"
+    submit_analysis_button: ".submit-analysis-button"
+
+    # Result popups
+    success_popup: ".success-section"  # "Analysis submitted successfully"
+    failure_popup: ".failure-section"  # "Action Failed! You must select..."
+
+# Timeout configurations (in milliseconds)
+timeouts:
+  login: 30000  # 30 seconds
+  page_load: 30000  # 30 seconds
+  field_creation: 15000  # 15 seconds
+  analysis_creation: 15000  # 15 seconds
+  file_upload: 120000  # 2 minutes (for large files with progress bar)
+  submit_analysis: 300000  # 5 minutes (entire workflow timeout)
+  popup_wait: 5000  # 5 seconds to wait for popups to appear
