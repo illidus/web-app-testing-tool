@@ -1,0 +1,32 @@
+{
+  "description": "Claude Code project settings for web app testing tool",
+  "autoApprove": {
+    "bash": [
+      "pytest",
+      "pytest -v",
+      "pytest --cov",
+      "pytest --cov-report=html",
+      "pytest --cov-report=term",
+      "npm test",
+      "npm run test",
+      "npm run test:unit",
+      "npm run test:integration",
+      "npm run build",
+      "npm run lint",
+      "npm run format",
+      "black .",
+      "black --check .",
+      "isort .",
+      "isort --check-only .",
+      "flake8 .",
+      "mypy .",
+      "eslint .",
+      "prettier --check .",
+      "python -c *"
+    ]
+  },
+  "context": {
+    "warnAtTokens": 150000,
+    "maxTokens": 200000
+  }
+}
