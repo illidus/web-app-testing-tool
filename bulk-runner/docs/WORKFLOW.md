@@ -298,6 +298,22 @@ Total time: **30 seconds to 5 minutes** depending on file sizes and processing
 ### VPN issues
 **Solution**: Confirm VPN connection, try accessing portal manually first
 
+### Windows Encoding Issues (Report Generation)
+**Symptom**: Tools crash with "charmap codec can't encode character" error
+**Solution**: UTF-8 encoding has been added to all report tools. If you still see this:
+📊 Analyzing test results...
+✅ Summary generated: C:\dev\web-app-testing-toolulk-runner\out\summary.md
+
+📈 Results:
+   Total: 1
+   Passed: 1
+   Failed: 0
+   Skipped: 0
+
+### Test Passes But Creates 404 on Field Page
+**Symptom**: Field creates successfully but page shows 404
+**Solution**: Backend race condition - retry mechanism added. If persists, increase timeout in catalog.yml
+
 ---
 
 ## References
@@ -309,5 +325,5 @@ Total time: **30 seconds to 5 minutes** depending on file sizes and processing
 
 ---
 
-**Last Updated**: 2024-11-11
+**Last Updated**: 2025-11-11
 **Workflow Version**: 1.0 (v1 - Lab + Survey only)
