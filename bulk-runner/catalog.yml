@@ -1,54 +1,87 @@
-# Test Matrix Configuration
-# Defines roles, feature flags, datasets, and repeat count for bulk testing
+# Test Matrix Configuration - SoilOptix Customer Portal
+# Updated for actual workflow: Field Creation → Analysis Creation → File Upload → Submit
 
+# Base URLs
+base_url: "https://customerportalstaging.local.soiloptix.com"
+farm_id: 20101  # Test farm ID
+
+# Roles (v1: single role)
 roles:
-  - analyst
-  - admin
+  - customer
 
-flags:
-  - name: fast_preprocess
-    values: [off, on]
-
+# Datasets (v1: single valid scenario)
 datasets:
-  - id: acme_small_ok
-    path: datasets/acme/small_ok.zip
+  - id: soiloptix_sample_valid
+    lab: datasets/soiloptix/lab/sample_lab_valid.csv
+    survey: datasets/soiloptix/survey/sample_survey_valid.zip
+    boundary: null  # Optional, not included in v1
     classification: synthetic
     expected: success
-  - id: acme_small_bad_header
-    path: datasets/acme/small_bad_header.zip
-    classification: synthetic
-    expected: input_error
-  - id: beta_medium_ok
-    path: datasets/beta/medium_ok.zip
-    classification: sanitized
-    expected: success
-  # Example of sensitive dataset (skipped by default)
-  # - id: prod_sample_anonymized
-  #   path: datasets/prod/sample_anonymized.zip
-  #   classification: real-sensitive
-  #   expected: success
 
 # Number of times to repeat each test permutation (for flake detection)
-repeats: 3
+repeats: 2
 
-# Page selectors (configurable for different environments)
+# Page selectors (from Chrome Inspect → Copy CSS Selector)
 selectors:
+  # Login page
   login:
-    username_field: "input[name='username']"
-    password_field: "input[name='password']"
-    submit_button: "button[type='submit']"
-  upload:
-    file_input: "input[type='file']"
-    submit_button: "button#upload-submit"
-    success_indicator: "text=Preprocessing complete"
-    error_banner: ".error-banner"
-  # Feature flag selectors (if visible in UI)
-  feature_flags:
-    fast_preprocess: "input[name='fast_preprocess']"
+    username_field: "div.login__input--container:nth-child(1) > input:nth-child(3)"
+    password_field: "#password"
+    submit_button: ".login__button--primary"
+
+  # Farm page - Field management
+  farm:
+    add_field_button: ".button__add-small"
+    field_name_input: ".create-popup--input-form"
+    create_field_button: ".create-popup--container > div:nth-child(1) > div:nth-child(4) > button:nth-child(2)"
+
+  # Analysis creation
+  analysis:
+    create_analysis_button: ".button__primary-create"
+    create_confirm_button: "div.create-popup--button-group:nth-child(3) > button:nth-child(2)"
+    analysis_details_link: ".mb-5"  # Link appears in success popup
+
+  # Analysis Details - Files tab
+  files:
+    files_tab: "button.tab-pill:nth-child(2)"
+
+    # Lab file upload
+    upload_lab_button: "div.file-folder-section:nth-child(2) > div:nth-child(1) > button:nth-child(2)"
+    lab_upload_box: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(4) > div:nth-child(3) > label:nth-child(1)"
+    lab_upload_confirm: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > button:nth-child(2)"
+
+    # Survey file upload
+    upload_survey_button: "div.file-folder-section:nth-child(3) > div:nth-child(1) > button:nth-child(2)"
+    survey_upload_box: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(4) > div:nth-child(3) > label:nth-child(1)"
+    survey_upload_confirm: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > button:nth-child(2)"
+
+    # Boundary file upload
+    upload_boundary_button: "div.file-folder-section:nth-child(4) > div:nth-child(1) > button:nth-child(2)"
+    boundary_upload_box: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(4) > div:nth-child(3) > label:nth-child(1)"
+    boundary_upload_confirm: "div.file-folder-section:nth-child(4) > div:nth-child(3) > div:nth-child(1) > div:nth-child(5) > div:nth-child(1) > button:nth-child(2)"
+
+    # Upload status and controls
+    upload_success: ".success-section"
+    upload_error: ".upload-error"
+    close_popup: "button.button__primary-dark:nth-child(1)"
+
+  # Submit tab
+  submit:
+    submit_tab: "button.tab-pill:nth-child(4)"
+    select_package_button: ".package-select-button"
+    save_package_button: ".save-package-button"
+    submit_analysis_button: ".submit-analysis-button"
+
+    # Result popups
+    success_popup: ".success-section"  # "Analysis submitted successfully"
+    failure_popup: ".failure-section"  # "Action Failed! You must select..."
 
 # Timeout configurations (in milliseconds)
 timeouts:
-  login: 10000
-  upload: 5000
-  preprocessing: 120000  # 2 minutes max for preprocessing
-  page_load: 30000
+  login: 10000  # 10 seconds
+  page_load: 30000  # 30 seconds
+  field_creation: 15000  # 15 seconds
+  analysis_creation: 15000  # 15 seconds
+  file_upload: 120000  # 2 minutes (for large files with progress bar)
+  submit_analysis: 300000  # 5 minutes (entire workflow timeout)
+  popup_wait: 5000  # 5 seconds to wait for popups to appear

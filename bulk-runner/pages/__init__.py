@@ -1,8 +1,9 @@
 """
-Page objects for the bulk upload workflow test runner.
+Page objects for the SoilOptix bulk upload workflow test runner.
 """
 
 from .login_page import LoginPage
-from .upload_page import UploadPage
+from .farm_page import FarmPage
+from .analysis_page import AnalysisPage
 
-__all__ = ['LoginPage', 'UploadPage']
+__all__ = ['LoginPage', 'FarmPage', 'AnalysisPage']
