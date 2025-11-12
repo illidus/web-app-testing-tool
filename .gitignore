@@ -108,3 +108,12 @@ playwright-report/
 test-results/
 coverage/
 .nyc_output/
+
+# Bulk runner specific
+out/
+bugs/
+
+# Sensitive datasets (never commit production data)
+datasets/**/real-*
+datasets/**/*sensitive*
+datasets/**/*prod*
