@@ -50,9 +50,20 @@ class FarmPage:
         try:
             timeout = self.timeouts.get('field_creation', 15000)
 
+            # Remove any toast notifications using JavaScript (they block clicks even with force=True)
+            try:
+                self.page.evaluate("""
+                    document.querySelectorAll('.Toastify__toast-container').forEach(el => el.remove());
+                    document.querySelectorAll('.Toastify__toast').forEach(el => el.remove());
+                """)
+                self.page.wait_for_timeout(1000)  # Wait longer for DOM to settle
+            except:
+                pass  # Toasts may not exist, that's fine
+
             # Click "Add new" field button
+            # Use force=True to bypass any remaining toast notifications
             add_button_selector = self.farm_selectors.get('add_field_button')
-            self.page.locator(add_button_selector).click(timeout=timeout)
+            self.page.locator(add_button_selector).click(force=True, timeout=timeout)
 
             # Wait for popup to appear
             self.page.wait_for_timeout(500)
