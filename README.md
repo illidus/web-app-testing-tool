@@ -6,12 +6,14 @@ Automated test framework for the SoilOptix Customer Portal upload workflow.
 
 Automates the complete 6-step workflow:
 1. **Login** to Customer Portal
-2. **Navigate** to Farm 20101
+2. **Navigate** to Business/Farm page
 3. **Create Field** (with "AutoTest" prefix)
 4. **Create Analysis**
-5. **Upload Files** (Lab CSV + Survey ZIP)
+5. **Upload Files** (Lab CSV + Survey ZIP + optional Boundary)
 6. **Submit Analysis** with package selection
 7. **Verify** success popup
+
+**NEW:** Multi-business testing support! Test across 8-10 providers with network drive datasets.
 
 ## Prerequisites
 
@@ -206,6 +208,31 @@ web-app-testing-tool/
 - **Quick Start:** This file
 - **Detailed Workflow:** [`docs/WORKFLOW.md`](docs/WORKFLOW.md) - Step-by-step with all selectors
 - **Technical Spec:** [`docs/PRD_UPDATED.md`](docs/PRD_UPDATED.md) - Complete PRD
+- **Multi-Business Testing:** [`docs/MULTI_BUSINESS_TESTING.md`](docs/MULTI_BUSINESS_TESTING.md) - Network drive dataset collection
+
+## Advanced: Multi-Business Testing
+
+Scale testing to 8-10 providers using network drive datasets:
+
+```bash
+# 1. Explore network drives
+python tools/explore_network_datasets.py \
+  --provider hutchinson \
+  --business-id 7635 \
+  --network-path "\\172.16.1.12\SoilData\2025\Hutchinson_UK\Hutchinson_UK" \
+  --limit 10
+
+# 2. Download datasets
+python tools/download_datasets.py --inventory inventory_hutchinson.json
+
+# 3. Generate catalog entries
+python tools/generate_catalog.py --provider hutchinson
+
+# 4. Run tests across multiple businesses
+python -m pytest -n auto
+```
+
+**See [`docs/MULTI_BUSINESS_TESTING.md`](docs/MULTI_BUSINESS_TESTING.md) for complete guide.**
 
 ## Version
 

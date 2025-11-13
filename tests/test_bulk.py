@@ -18,6 +18,7 @@ def test_upload_workflow(
     page: Page,
     base_url: str,
     farm_id: int,
+    business_id: int,
     credentials: Dict[str, str],
     test_params: Dict[str, Any],
     artifact_paths: Dict[str, Any]
@@ -81,12 +82,16 @@ def test_upload_workflow(
     print(f"✅ Successfully logged in\n")
 
     # ========================================================================
-    # Step 2: Navigate to Farm
+    # Step 2: Navigate to Business/Farm
     # ========================================================================
-    print(f"🚜 Step 2: Navigating to Farm {farm_id}")
-    farm_page = FarmPage(page, base_url, farm_id, selectors, timeouts)
+    if business_id:
+        print(f"🏢 Step 2: Navigating to Business {business_id}")
+    else:
+        print(f"🚜 Step 2: Navigating to Farm {farm_id}")
+
+    farm_page = FarmPage(page, base_url, farm_id, selectors, timeouts, business_id)
     farm_page.navigate()
-    print(f"✅ Navigated to farm page\n")
+    print(f"✅ Navigated to business/farm page\n")
 
     # ========================================================================
     # Step 3: Create Field

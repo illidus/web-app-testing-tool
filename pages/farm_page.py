@@ -11,28 +11,51 @@ from playwright.sync_api import Page
 class FarmPage:
     """Page object for farm and field management."""
 
-    def __init__(self, page: Page, base_url: str, farm_id: int, selectors: Dict[str, Any], timeouts: Dict[str, int]):
+    def __init__(
+        self,
+        page: Page,
+        base_url: str,
+        farm_id: int,
+        selectors: Dict[str, Any],
+        timeouts: Dict[str, int],
+        business_id: int = None
+    ):
         """
         Initialize the farm page.
 
         Args:
             page: Playwright page instance
             base_url: Base URL of the application
-            farm_id: Farm ID to navigate to
+            farm_id: Farm ID to navigate to (used if business_id not provided)
             selectors: Selector configuration from catalog
             timeouts: Timeout configuration from catalog
+            business_id: Optional business ID for multi-business testing
         """
         self.page = page
         self.base_url = base_url
         self.farm_id = farm_id
+        self.business_id = business_id
         self.farm_selectors = selectors.get('farm', {})
         self.analysis_selectors = selectors.get('analysis', {})
         self.timeouts = timeouts
 
     def navigate(self):
-        """Navigate to the farm page."""
-        farm_url = f"{self.base_url}/Farms/{self.farm_id}"
-        self.page.goto(farm_url, timeout=self.timeouts.get('page_load', 30000))
+        """
+        Navigate to the business or farm page.
+
+        If business_id is set, navigates to /Businesses/{business_id}.
+        Otherwise, navigates to /Farms/{farm_id} (legacy behavior).
+        """
+        if self.business_id:
+            # Multi-business testing: navigate to business page
+            nav_url = f"{self.base_url}/Businesses/{self.business_id}"
+            print(f"   Navigating to Business {self.business_id}")
+        else:
+            # Legacy: navigate directly to farm page
+            nav_url = f"{self.base_url}/Farms/{self.farm_id}"
+            print(f"   Navigating to Farm {self.farm_id}")
+
+        self.page.goto(nav_url, timeout=self.timeouts.get('page_load', 30000))
 
     def create_field(self, field_name: str) -> str:
         """

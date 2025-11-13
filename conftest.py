@@ -257,6 +257,35 @@ def farm_id(test_params: Dict[str, Any]):
 
 
 @pytest.fixture
+def business_id(test_params: Dict[str, Any]):
+    """
+    Provide the business ID from dataset or environment variables.
+
+    Business ID determines which business page to navigate to.
+    Falls back to None if not specified (uses farm_id instead).
+    """
+    # Try dataset-specific business_id first
+    dataset = test_params.get('dataset', {})
+    biz_id = dataset.get('business_id')
+    if biz_id:
+        return int(biz_id)
+
+    # Try environment variable
+    biz_id = os.getenv('BUSINESS_ID')
+    if biz_id:
+        return int(biz_id)
+
+    # Fall back to catalog
+    catalog = test_params.get('catalog', {})
+    biz_id = catalog.get('business_id')
+    if biz_id:
+        return int(biz_id)
+
+    # Return None - will use farm_id navigation instead
+    return None
+
+
+@pytest.fixture
 def credentials(test_params: Dict[str, Any]):
     """Provide role-specific credentials from environment variables."""
     role = test_params['role']
