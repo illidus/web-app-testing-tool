@@ -4,11 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## Project Overview
 
-This is a web application testing tool designed to [description to be added based on PRD].
+This is an automated test framework for the SoilOptix Customer Portal upload workflow. It uses Playwright + pytest to automate the complete 6-step workflow for creating fields, analyses, and uploading agricultural data files.
 
 **Key Objectives:**
-- [To be defined from PRD]
-- [To be defined from PRD]
+- Automate end-to-end testing of SoilOptix Customer Portal workflows
+- Support multi-dataset testing with synthetic, sanitized, and real data
+- Generate comprehensive test reports with screenshots and traces
+- Enable parallel test execution for faster feedback
+- Provide clear bug reports with full debugging context
 
 ## Quick Start Commands
 
@@ -26,30 +29,37 @@ git log --oneline -10
 
 ### Development
 ```bash
-# Install dependencies (if Node.js/Python)
-npm install  # or pip install -r requirements.txt
+# Install dependencies
+pip install -r requirements.txt
+
+# Install Playwright browsers
+python -m playwright install chromium
 
 # Run tests
-npm test  # or pytest
+python -m pytest -n auto
 
-# Run the application
-npm start  # or python main.py
+# Run tests with visible browser
+python -m pytest --headed --slow-mo 500
 
-# Build
-npm run build
+# Generate test reports
+python tools/summarize.py
+python tools/mk_bug_packets.py
 ```
 
 ### Testing
 ```bash
-# Run all tests
-npm test  # or pytest
+# Run all tests (parallel)
+python -m pytest -n auto
 
-# Run with coverage
-npm run test:coverage  # or pytest --cov
+# Run tests (single-threaded for debugging)
+python -m pytest -v
 
-# Run specific test suite
-npm run test:unit
-npm run test:integration
+# Run smoke tests only
+python -m pytest -k smoke
+
+# View test results
+cat out/summary.md
+cat out/pytest.log
 ```
 
 ## Project Structure
@@ -58,12 +68,42 @@ npm run test:integration
 web-app-testing-tool/
 ├── .claude/                  # Claude Code configuration
 │   └── settings.json        # Auto-approve patterns and context settings
-├── src/                     # Source code (structure TBD)
-├── tests/                   # Test suite
+│
+├── pages/                   # Page Object Model (POM)
+│   ├── login_page.py        # Login functionality
+│   ├── farm_page.py         # Field creation and management
+│   ├── analysis_page.py     # Analysis creation and file uploads
+│   └── upload_page.py       # Legacy (not currently used)
+│
+├── tests/                   # Pytest test suite
+│   └── test_bulk.py         # Main test implementation
+│
+├── tools/                   # Post-processing scripts
+│   ├── summarize.py         # Generate summary.md reports
+│   └── mk_bug_packets.py    # Generate bug reports
+│
+├── datasets/                # Test data (gitignored for sensitive data)
+│   └── soiloptix/
+│       ├── lab/             # Lab CSV files
+│       └── survey/          # Survey ZIP files
+│
 ├── docs/                    # Documentation
-├── CLAUDE.md               # This file
-├── README.md               # Project documentation
-└── [Additional structure based on tech stack]
+│   ├── PRD_UPDATED.md       # Complete technical specification
+│   └── WORKFLOW.md          # Step-by-step workflow guide
+│
+├── out/                     # Test results (gitignored)
+│   ├── summary.md           # Test summary report
+│   ├── results.json         # pytest-json-report output
+│   ├── screenshots/         # Failure screenshots
+│   └── traces/              # Playwright traces
+│
+├── catalog.yml              # Test matrix, selectors, timeouts
+├── conftest.py              # Pytest fixtures and parametrization
+├── pytest.ini               # Pytest configuration
+├── requirements.txt         # Python dependencies
+├── .env.example             # Credentials template
+├── CLAUDE.md                # This file
+└── README.md                # Main documentation
 ```
 
 ## Development Workflow

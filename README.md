@@ -22,14 +22,16 @@ Automates the complete 6-step workflow:
 
 ✅ **Already Included:**
 - Test credentials (in `.env.example`)
-- Sample datasets (Lab CSV, Survey ZIP)
+- Sample Lab CSV dataset
 - All selectors configured
+
+⚠️ **Note:** Survey ZIP file needs to be created or obtained before running tests (see catalog.yml)
 
 ## Quick Start (First Time)
 
 ```bash
-# 1. Navigate to the bulk-runner directory
-cd bulk-runner
+# 1. Clone/navigate to the repository
+cd web-app-testing-tool
 
 # 2. Create virtual environment
 python -m venv .venv
@@ -92,7 +94,10 @@ Ready-to-paste bug reports with screenshots and traces.
 After first-time setup, just:
 
 ```bash
-cd bulk-runner
+# Activate virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Run tests
 python -m pytest -n auto     # Run tests
 python tools/summarize.py    # Generate summary
 ```
@@ -160,12 +165,14 @@ cat out/pytest.log
 ## File Structure
 
 ```
-bulk-runner/
+web-app-testing-tool/
 ├── .env.example          # Credentials template (copy to .env)
 ├── catalog.yml           # Selectors and configuration
 ├── pytest.ini            # Pytest settings
 ├── conftest.py           # Test fixtures
 ├── requirements.txt      # Python dependencies
+├── README.md             # This file
+├── CLAUDE.md             # Claude Code guidance
 │
 ├── pages/                # Page Objects (POM pattern)
 │   ├── login_page.py

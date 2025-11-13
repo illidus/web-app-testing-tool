@@ -357,23 +357,31 @@ After creating analysis:
 
 ## 12) File Structure (Updated)
 
+**Note:** As of 2025-11-11, the repository structure was flattened. All files previously in `bulk-runner/` subdirectory are now at the repository root level.
+
 ```
-bulk-runner/
+web-app-testing-tool/
 ├── catalog.yml              # Updated with real selectors
 ├── conftest.py              # Matrix generation, fixtures
 ├── pytest.ini              # Pytest config
 ├── requirements.txt         # Dependencies
 ├── .env.example            # Credential template
+├── README.md               # Main documentation
+├── CLAUDE.md               # Claude Code guidance
+│
 ├── pages/
 │   ├── login_page.py       # Updated with real selectors
 │   ├── farm_page.py        # NEW - Field creation
 │   ├── analysis_page.py    # NEW - Analysis creation, file uploads, submit
 │   └── upload_page.py      # DEPRECATED - not used in actual workflow
+│
 ├── tests/
 │   └── test_bulk.py        # Updated for 6-step workflow
+│
 ├── tools/
 │   ├── summarize.py        # Generate summary.md
 │   └── mk_bug_packets.py   # Generate bug packets
+│
 ├── datasets/
 │   └── soiloptix/
 │       ├── lab/
@@ -382,9 +390,11 @@ bulk-runner/
 │       │   └── sample_survey_valid.zip
 │       └── boundary/
 │           └── sample_boundary_valid.zip
+│
 ├── docs/
 │   ├── PRD_UPDATED.md      # This file
 │   └── WORKFLOW.md         # Step-by-step workflow documentation
+│
 └── out/                    # Test results (gitignored)
 ```
 
