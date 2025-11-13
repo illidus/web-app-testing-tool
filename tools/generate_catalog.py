@@ -18,9 +18,14 @@ Usage:
 import argparse
 import json
 import sys
+import io
 import yaml
 from pathlib import Path
 from typing import Dict, List
+
+# Set UTF-8 encoding for Windows console to support special characters
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
 
 # Provider to Business ID mapping
 BUSINESS_MAPPING = {
@@ -144,12 +149,22 @@ def generate_dataset_entry(dataset_dir: Path, metadata: Dict) -> Dict:
     }
 
     # Add file paths (relative to repository root)
+    cwd = Path.cwd()
     if lab_files:
-        entry["lab"] = str(lab_files[0].relative_to(Path.cwd()))
+        try:
+            entry["lab"] = str(lab_files[0].relative_to(cwd)).replace('\\', '/')
+        except ValueError:
+            entry["lab"] = str(lab_files[0]).replace('\\', '/')
     if survey_files:
-        entry["survey"] = str(survey_files[0].relative_to(Path.cwd()))
+        try:
+            entry["survey"] = str(survey_files[0].relative_to(cwd)).replace('\\', '/')
+        except ValueError:
+            entry["survey"] = str(survey_files[0]).replace('\\', '/')
     if boundary_files:
-        entry["boundary"] = str(boundary_files[0].relative_to(Path.cwd()))
+        try:
+            entry["boundary"] = str(boundary_files[0].relative_to(cwd)).replace('\\', '/')
+        except ValueError:
+            entry["boundary"] = str(boundary_files[0]).replace('\\', '/')
     else:
         entry["boundary"] = None
 

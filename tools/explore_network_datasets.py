@@ -18,10 +18,15 @@ import argparse
 import json
 import os
 import sys
+import io
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
 import hashlib
+
+# Set UTF-8 encoding for Windows console to support special characters
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
 
 # Safety banner
 SAFETY_BANNER = """
@@ -67,7 +72,12 @@ def validate_network_path(path: str) -> bool:
     Returns:
         True if path is approved, False otherwise
     """
-    return any(path.startswith(approved) for approved in APPROVED_NETWORK_PATHS)
+    # Normalize path: convert forward slashes to backslashes and ensure double backslash prefix
+    normalized = path.replace('/', '\\')
+    if normalized.startswith('\\') and not normalized.startswith('\\\\'):
+        normalized = '\\' + normalized
+
+    return any(normalized.startswith(approved) for approved in APPROVED_NETWORK_PATHS)
 
 
 def anonymize_name(name: str, salt: str = "soiloptix") -> str:
@@ -220,7 +230,12 @@ def explore_provider_structure(
     if not validate_network_path(network_path):
         raise ValueError(f"Network path not approved: {network_path}")
 
-    base_path = Path(network_path)
+    # Normalize path for Windows: convert forward slashes to backslashes
+    normalized_path = network_path.replace('/', '\\')
+    if normalized_path.startswith('\\') and not normalized_path.startswith('\\\\'):
+        normalized_path = '\\' + normalized_path
+
+    base_path = Path(normalized_path)
 
     if not base_path.exists():
         raise FileNotFoundError(f"Network path not found: {network_path}")
@@ -354,7 +369,8 @@ def explore_provider_structure(
 
 def main():
     """Main entry point for network dataset explorer."""
-    print(SAFETY_BANNER)
+    print("DEBUG: Starting main()", flush=True)
+    print(SAFETY_BANNER, flush=True)
 
     parser = argparse.ArgumentParser(
         description="Explore network drives for valid SoilOptix test datasets (READ-ONLY)",

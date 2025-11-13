@@ -16,9 +16,14 @@ import argparse
 import json
 import shutil
 import sys
+import io
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List
+
+# Set UTF-8 encoding for Windows console to support special characters
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Safety banner
 SAFETY_BANNER = """

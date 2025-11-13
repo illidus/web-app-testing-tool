@@ -3,19 +3,36 @@
 
 # Base URLs
 base_url: "https://customerportalstaging.local.soiloptix.com"
-farm_id: 20101  # Test farm ID
+analyst_base_url: "https://analystportalstaging.local.soiloptix.com"
+farm_id: 20101  # Test farm ID (legacy - for original synthetic test)
+
+# Business/Provider Definitions
+businesses:
+  - id: 7635
+    name: Hutchinson_UK
+    code: hlh
 
 # Roles (v1: single role)
 roles:
   - customer
 
-# Datasets (v1: single valid scenario)
+# Datasets (v1: single valid scenario + Hutchinson real data)
 datasets:
   - id: soiloptix_sample_valid
     lab: datasets/soiloptix/lab/sample_lab_valid.csv
     survey: datasets/soiloptix/survey/sample_survey_valid.zip
     boundary: null  # Optional, not included in v1
     classification: synthetic
+    expected: success
+
+  # HUTCHINSON datasets (real customer data, anonymized)
+  - id: hutchinson_001
+    business_id: 7635
+    provider: hutchinson
+    lab: datasets/hutchinson/hutchinson_001/lab/20250812_2729722_1.csv
+    survey: datasets/hutchinson/hutchinson_001/survey/20250729_103354_SO.25.B.0137_RO_GD_and_BR_Williams-RO_GD_and_BR_Williams-8_Gas_Field_8106_2025-07-28T18_26_06.417Z.zip
+    boundary: datasets/hutchinson/hutchinson_001/boundary/20250729_103344_boundaries.zip
+    classification: sanitized
     expected: success
 
 # Number of times to repeat each test permutation (for flake detection)
@@ -31,7 +48,7 @@ selectors:
 
   # Farm page - Field management
   farm:
-    add_field_button: ".button__add-small"
+    add_field_button: 'button[title="Add new Farm"]'  # Changed to be specific for business page context
     field_name_input: ".create-popup--input-form"
     create_field_button: ".create-popup--container > div:nth-child(1) > div:nth-child(4) > button:nth-child(2)"
 
@@ -82,6 +99,6 @@ timeouts:
   page_load: 30000  # 30 seconds
   field_creation: 15000  # 15 seconds
   analysis_creation: 15000  # 15 seconds
-  file_upload: 120000  # 2 minutes (for large files with progress bar)
+  file_upload: 240000  # 4 minutes (for large files like 100+ MB survey files)
   submit_analysis: 300000  # 5 minutes (entire workflow timeout)
   popup_wait: 5000  # 5 seconds to wait for popups to appear

@@ -1,0 +1,22 @@
+{
+  "id": "hutchinson_001",
+  "provider": "hutchinson",
+  "source_path": "\\\\172.16.1.12\\SoilData\\2025\\Hutchinson_UK\\Hutchinson_UK\\RO_GD_and_BR_Williams\\RO_GD_and_BR_Williams\\8_Gas_Field_8106\\87560",
+  "customer_hash": "92f1de13",
+  "farm_hash": "8a9fa48c",
+  "field_hash": "8a9fa48c",
+  "numbered_folder": "87560",
+  "files": {
+    "labs": [
+      "Labs/20250813_050114_samples.zip"
+    ],
+    "surveys": [
+      "Surveys/20250729_103354_SO.25.B.0137_RO_GD_and_BR_Williams-RO_GD_and_BR_Williams-8_Gas_Field_8106_2025-07-28T18_26_06.417Z.zip"
+    ],
+    "boundaries": [
+      "Boundaries/20250729_103344_boundaries.zip"
+    ]
+  },
+  "size_mb": 10,
+  "downloaded_at": "2025-11-13T14:26:50.015492"
+}

@@ -61,6 +61,8 @@ class FarmPage:
         """
         Create a new field with the given name.
 
+        If on a business page, will first create a farm then create the field.
+
         Args:
             field_name: Name for the new field
 
@@ -72,6 +74,14 @@ class FarmPage:
         """
         try:
             timeout = self.timeouts.get('field_creation', 15000)
+            current_url = self.page.url
+
+            # If we're on a business page, we need to create a farm first
+            if '/Businesses/' in current_url:
+                print(f"   On business page, creating farm first...")
+                farm_name = f"TestFarm_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                self._create_farm(farm_name)
+                print(f"   ✅ Farm created, now creating field...")
 
             # Remove any toast notifications using JavaScript (they block clicks even with force=True)
             try:
@@ -84,8 +94,14 @@ class FarmPage:
                 pass  # Toasts may not exist, that's fine
 
             # Click "Add new" field button
+            # On a farm page, use the generic .button__add-small selector (it's for adding fields)
             # Use force=True to bypass any remaining toast notifications
-            add_button_selector = self.farm_selectors.get('add_field_button')
+            if '/Farms/' in self.page.url:
+                # On farm page - the .button__add-small is for adding fields
+                add_button_selector = '.button__add-small'
+            else:
+                # Use configured selector
+                add_button_selector = self.farm_selectors.get('add_field_button')
             self.page.locator(add_button_selector).click(force=True, timeout=timeout)
 
             # Wait for popup to appear
@@ -130,6 +146,45 @@ class FarmPage:
 
         except Exception as e:
             raise Exception(f"Field creation failed: {str(e)}")
+
+    def _create_farm(self, farm_name: str):
+        """
+        Helper method to create a farm when on a business page.
+
+        Args:
+            farm_name: Name for the new farm
+        """
+        timeout = self.timeouts.get('field_creation', 15000)
+
+        # Remove any toast notifications
+        try:
+            self.page.evaluate("""
+                document.querySelectorAll('.Toastify__toast-container').forEach(el => el.remove());
+                document.querySelectorAll('.Toastify__toast').forEach(el => el.remove());
+            """)
+            self.page.wait_for_timeout(500)
+        except:
+            pass
+
+        # Click "Add new Farm" button
+        farm_button_selector = self.farm_selectors.get('add_field_button')  # Uses same selector
+        self.page.locator(farm_button_selector).click(force=True, timeout=timeout)
+
+        # Wait for popup to appear
+        self.page.wait_for_timeout(500)
+
+        # Enter farm name
+        farm_input_selector = self.farm_selectors.get('field_name_input')  # Uses same input
+        self.page.locator(farm_input_selector).fill(farm_name, timeout=timeout)
+
+        # Click create button
+        create_button_selector = self.farm_selectors.get('create_field_button')  # Uses same button
+        self.page.locator(create_button_selector).click(timeout=timeout)
+
+        # Wait for navigation to the new farm page
+        # URL format: https://.../Farms/XXXXX
+        self.page.wait_for_url(lambda url: '/Farms/' in url, timeout=timeout)
+        self.page.wait_for_timeout(1000)  # Let the farm page load
 
     def create_analysis(self) -> str:
         """
