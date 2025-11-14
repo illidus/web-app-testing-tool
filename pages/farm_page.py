@@ -80,8 +80,8 @@ class FarmPage:
             if '/Businesses/' in current_url:
                 print(f"   On business page, creating farm first...")
                 farm_name = f"TestFarm_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-                self._create_farm(farm_name)
-                print(f"   ✅ Farm created, now creating field...")
+                farm_id = self._create_farm(farm_name)
+                print(f"   ✅ Farm {farm_id} created, now creating field...")
 
             # Remove any toast notifications using JavaScript (they block clicks even with force=True)
             try:
@@ -93,16 +93,18 @@ class FarmPage:
             except:
                 pass  # Toasts may not exist, that's fine
 
-            # Click "Add new" field button
-            # On a farm page, use the generic .button__add-small selector (it's for adding fields)
-            # Use force=True to bypass any remaining toast notifications
+            # Determine which button selector to use based on current page context
+            # On a farm page, we want to add a field
+            # On a business page (shouldn't happen after farm creation), use configured selector
             if '/Farms/' in self.page.url:
-                # On farm page - the .button__add-small is for adding fields
-                add_button_selector = '.button__add-small'
+                # On farm page - use .button__add-small and take first match
+                # This avoids the strict mode violation when multiple buttons exist
+                self.page.locator('.button__add-small').first.click(force=True, timeout=timeout)
             else:
-                # Use configured selector
+                # Still on business page - shouldn't happen, but handle it
+                # Use the more specific button title selector
                 add_button_selector = self.farm_selectors.get('add_field_button')
-            self.page.locator(add_button_selector).click(force=True, timeout=timeout)
+                self.page.locator(add_button_selector).click(force=True, timeout=timeout)
 
             # Wait for popup to appear
             self.page.wait_for_timeout(500)
@@ -147,12 +149,15 @@ class FarmPage:
         except Exception as e:
             raise Exception(f"Field creation failed: {str(e)}")
 
-    def _create_farm(self, farm_name: str):
+    def _create_farm(self, farm_name: str) -> str:
         """
         Helper method to create a farm when on a business page.
 
         Args:
             farm_name: Name for the new farm
+
+        Returns:
+            The farm ID extracted from the URL after creation
         """
         timeout = self.timeouts.get('field_creation', 15000)
 
@@ -185,6 +190,10 @@ class FarmPage:
         # URL format: https://.../Farms/XXXXX
         self.page.wait_for_url(lambda url: '/Farms/' in url, timeout=timeout)
         self.page.wait_for_timeout(1000)  # Let the farm page load
+
+        # Extract farm ID from URL
+        farm_id = self.page.url.split('/Farms/')[-1].split('/')[0]
+        return farm_id
 
     def create_analysis(self) -> str:
         """
